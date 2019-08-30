@@ -21,7 +21,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "computer-science",
     libraryDependencies ++= Seq(
-      scalaTest % Test,
+      scalaTest
       
     )
   )

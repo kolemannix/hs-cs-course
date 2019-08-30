@@ -1,4 +1,5 @@
 import com.sksamuel.scrimage.{ Image, Pixel }
+
 import Img._
 
 object UnitXImages extends App {

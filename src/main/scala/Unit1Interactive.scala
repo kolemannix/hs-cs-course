@@ -1,5 +1,3 @@
-
-
 object ChangeCountr extends App {
 
   println("Welcome to ChangeCountr, the next Killer App.")
