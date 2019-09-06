@@ -9,7 +9,7 @@ ThisBuild / scalaVersion := "2.12.8"
 resolvers += Resolver.bintrayRepo("underscoreio", "training")
 
 lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.0.8"
-lazy val doodle = "underscoreio" %% "doodle" % "0.8.3"
+// lazy val doodle = "underscoreio" %% "doodle" % "0.8.3"
 lazy val scrimageCore = "com.sksamuel.scrimage" %% "scrimage-core" % "2.1.8"
 lazy val scrimageExtra = "com.sksamuel.scrimage" %% "scrimage-io-extra" % "2.1.8"
 lazy val scrimageFilters = "com.sksamuel.scrimage" %% "scrimage-filters" % "2.1.8"
@@ -34,7 +34,6 @@ lazy val lib = (project in file("lib"))
     libraryDependencies ++= Seq(
       scalaMeta,
       scalaReflect,
-      doodle,
       scrimageCore,
       scrimageExtra,
       scrimageFilters,

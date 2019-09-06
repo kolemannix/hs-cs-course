@@ -1,6 +1,6 @@
 import scala.util.Try
 
-import lib.{ DebugMacro, Util }
+import lib.Util
 import org.scalatest.Assertions._
 
 object Unit1Expressions extends App {

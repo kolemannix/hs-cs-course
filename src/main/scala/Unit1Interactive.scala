@@ -1,4 +1,3 @@
-import ChangeCountr2.{ dimes, nickels, quarters }
 import lib.Util
 
 object ChangeCountr extends App {
@@ -21,8 +20,8 @@ object ChangeCountr extends App {
   val penniesInput = Util.readLine()
   val pennies = penniesInput.toInt
 
-  val result = Util.debug((quarters * 25) + (dimes * 10) + (nickels * 5) + pennies)
-  println(s"You've got ${result} cents")
+  val cents = (quarters * 25) + (dimes * 10) + (nickels * 5) + pennies
+  println("You've got " + cents + " cents")
 }
 
 object ChangeCountr2 extends App {
@@ -33,19 +32,26 @@ object ChangeCountr2 extends App {
     (quarters * 25) + (dimes * 10) + (nickels * 5) + pennies
   }
 
+  def formatCents(input: Int): String = {
+    val dollars = input / 100
+    val cents = input % 100
+    val centsFormatted = cents.formatted("%02d")
+    dollars + "." + centsFormatted
+  }
+
   def collect(prompt: String): Int = {
     print(prompt + ": ")
     val input = Util.readLine()
     input.toInt
   }
 
-  val quarters = collect("Number of quarters: ")
-  val dimes = collect("Number of dimes: ")
-  val nickels = collect("Number of nickels: ")
-  val pennies = collect("Number of pennies: ")
+  val quarters = collect("Number of quarters")
+  val dimes = collect("Number of dimes")
+  val nickels = collect("Number of nickels")
+  val pennies = collect("Number of pennies")
 
-  val result = computeCents(quarters, dimes, nickels, pennies)
-  println(s"You've got ${result} cents")
+  val cents = computeCents(quarters, dimes, nickels, pennies)
+  println("You've got $" + formatCents(cents))
 }
 
 // Write a program, using ChangeCountr as a template, that reads

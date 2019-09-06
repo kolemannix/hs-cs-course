@@ -30,7 +30,6 @@ object Unit1Exercises extends App {
 
   // 4. Define a function that solves the quadratic formula, given a, b, and c
   def quadratic(a: Double, b: Double, c: Double): Seq[Double] = {
-    ???
     // -b
     val negativeB = b * -1.0
 
@@ -45,5 +44,7 @@ object Unit1Exercises extends App {
     val root2 = numeratorMinus.map(n => n / denominator)
     Seq(root1, root2).flatten
   }
+
+  println("x^2 + x - 1: " + quadratic(1, 1, -1))
 
 }
