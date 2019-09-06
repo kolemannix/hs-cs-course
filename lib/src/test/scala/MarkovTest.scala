@@ -1,5 +1,5 @@
-import Markov.{ buildDatabase, generate }
-import Util.example
+import lib.Markov.{ buildDatabase, generate }
+import lib.Util.example
 import better.files.Resource
 
 class MarkovTest {

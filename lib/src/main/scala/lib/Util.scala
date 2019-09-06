@@ -1,7 +1,9 @@
+package lib
+
 import java.io.{ BufferedReader, InputStreamReader }
 import java.text.DecimalFormat
-
 import scala.language.experimental.macros
+
 import scala.reflect.macros.Context
 import scala.util.Random
 

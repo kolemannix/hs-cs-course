@@ -1,8 +1,7 @@
+package lib
+
 import java.time.Instant
-
-import better.files.Resource
-
-import Util._
+import lib.Util._
 
 object Markov extends App {
 

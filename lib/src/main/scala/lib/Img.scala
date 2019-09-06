@@ -1,3 +1,5 @@
+package lib
+
 import java.awt.Graphics
 import java.net.URL
 
@@ -16,6 +18,18 @@ object Img {
     Image.fromStream(inputStream)
   }
 
+  def buildImage(width: Int, height: Int, builder: (Int, Int) => Pixel): Image = {
+    Image.apply(width, height).map { case (x, y, _) =>
+      builder(x, y)
+    }
+  }
+
+  def clamp255(value: Int): Int = {
+    if (value < 0) 0
+    else if (value > 255) 255
+    else value
+  }
+
   def draw(image: Image, title: String = "Image"): Unit = {
     val swingFrame = new javax.swing.JFrame(title)
 
@@ -29,7 +43,7 @@ object Img {
     swingFrame.add(panel)
 
     swingFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-    swingFrame.setSize(image.width, image.height)
+    swingFrame.setSize(image.width, image.height + 20)
     swingFrame.setVisible(true)
   }
 

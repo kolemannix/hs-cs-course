@@ -1,6 +1,7 @@
-import UnitXImages.{ flower, gandalf }
-import com.sksamuel.scrimage.{ Color, Image, Pixel }
+package solutions
+
 import lib.Img._
+import com.sksamuel.scrimage.{ Image, Pixel }
 
 object UnitXImages extends App {
 
@@ -15,8 +16,8 @@ object UnitXImages extends App {
   // draw(flower)
   // draw(yoda)
 
-  val red = buildImage(40, 40, { (x, y) => Pixel(255, 0, 0, 255) })
-  draw(red)
+  val red = buildImage(width = 40, height = 40, { (x, y) => Pixel(255, 0, 0, 255) })
+  // draw(red)
 
   def lightenSimple(pixel: Pixel): Pixel = {
     val redLightened = clamp255(pixel.red + 10)
@@ -29,24 +30,32 @@ object UnitXImages extends App {
     Pixel(r = original.green, g = original.red, b = original.blue, original.alpha)
   }
 
-}
-
-object UnitXImagesExercises extends App {
   // Exercises 1-5 can be done with an image of your choice from the above options,
   // or, use an image of your own!
 
   // Exercise 1 - Maximize all the green values, leaving everything else the same
   // Name your resulting image exercise1
   val exercise1 = transformImage(flower, p => Pixel(p.red, 255, p.green, p.alpha))
+  // draw(exercise1)
 
   // Exercise 2 - Convert an image to grayscale using the Average method
   // Name your resulting image exercise2
+  val exercise2 = transformImage(gandalf, { p =>
+    val avg = (p.red + p.green + p.blue) / 3
+    Pixel(avg, avg, avg, p.alpha)
+  })
+  // draw(exercise2)
 
   // Exercise 3 - Convert an image to grayscale using the Luminance method
   // Name your resulting image exercise3
   val lumRed = 0.30
   val lumGreen = 0.59
   val lumBlue = 0.11
+  val exercise3 = transformImage(flower, { p =>
+    val avgLum = (lumRed * p.red) + (lumGreen * p.green) + (lumBlue * p.blue)
+    Pixel(avgLum.toInt, avgLum.toInt, avgLum.toInt, p.alpha)
+  })
+  // draw(exercise3)
 
   // Think about the similarities between exercise 2 and exercise 3.
   // - Are they really the same algorithm?
@@ -59,11 +68,43 @@ object UnitXImagesExercises extends App {
   // Can you decode the image? What is puzzle_one a picture of?
   lazy val puzzleOne = Image.fromResource("/image/puzzle_one.png")
 
+  def decodeOne(p: Pixel): Pixel = {
+    val redBoosted = p.red * 10
+    Pixel(r = redBoosted, g = redBoosted, b = redBoosted, p.alpha)
+  }
+  val exercise4 = transformImage(puzzleOne, decodeOne)
+  //  draw(puzzleOne)
+  //  draw(exercise4)
+
   // Exercise 5
   // There is a hidden image in puzzle_two. Can you write a transformation to
   // bring it out? What is it a picture of?
+  val puzzleTwo = Image.fromResource("/image/puzzle_two.png")
+  def decodeTwo(p: Pixel): Pixel = {
+    Pixel(0, p.green * 20, p.blue * 20, p.alpha)
+  }
+  val exercise5 = transformImage(puzzleTwo, decodeTwo)
+  //  draw(puzzleTwo)
+  //  draw(exercise5)
 
-  // Exercise 6. Find the hidden image
+  // Exercise 6
   val puzzleThree = Image.fromResource("/image/puzzle_three.png")
 
+  def decodeThree(p: Pixel): Pixel = {
+    val blueValue =
+      if (p.blue < 16)
+        p.blue * 16.0
+      else
+        p.blue
+    Pixel(0, 0, blueValue.toInt, p.alpha)
+  }
+  val exercise6 = transformImage(puzzleThree, decodeThree)
+  val reds = transformImage(puzzleThree, { p => Pixel(p.red, 0, 0, p.alpha)})
+  val greens = transformImage(puzzleThree, { p => Pixel(0, p.green, 0, p.alpha)})
+  val blues = transformImage(puzzleThree, { p => Pixel(0, 0, p.blue, p.alpha)})
+  //  draw(reds)
+  //  draw(greens)
+  //  draw(blues)
+  //  draw(puzzleThree)
+  //  draw(exercise6)
 }
