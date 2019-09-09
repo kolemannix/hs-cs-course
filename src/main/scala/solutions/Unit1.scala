@@ -2,33 +2,117 @@ package solutions
 
 import scala.util.Try
 
-object Unit1Exercises extends App {
+import lib.Util
+import org.scalatest.Assertions._
 
-  // 1. Define and test a function that squares an integer
-  def square(i: Int): Int = {
-    i * i
+object Unit1Expressions extends App {
+
+  // Numbers
+  assert(1 + 1 == 2)
+
+  println(25 / 5)
+
+  println(27 / 5)
+
+  println(27.0 / 5.0)
+
+  // An approximation. How would we repesent true fractions?
+  println(1.0 / 3.0)
+
+  println(Try { 25 / 0 })
+
+  println(4 > 2)
+
+  // Booleans
+  println(true == false)
+
+  println(true == true)
+
+  if (4 > 2) {
+    println("yes")
+  } else {
+    println("no")
   }
 
-  println(square(2))
-  println(square(4))
-  println(square(-3))
-
-  // 2. Define and test a function that repeats a string. For example:
-  //    Given "hello", it will return "hellohello"
-  def repeat(input: String): String = {
-    // input.++(input)
-    input ++ input
+  if (false || true) {
+    println("yes")
+  } else {
+    println("no")
   }
 
-  // 3. Define and test a function that converts a celsius temperature to fahrenheit
-  def celsiusToFahr(celsius: Double): Double = {
-    (celsius * (9 / 5)) + 32
+  // Strings
+  println("Hello, World")
+
+  println("Hello, World".toUpperCase)
+  println("Hello, " + "World")
+
+  println("Hello".head)
+  println("Hello".tail)
+  println("Hello".last)
+}
+
+object Unit1Functions extends App {
+
+  def plus3(x: Int): Int = {
+    x + 3
   }
 
-  println("3.")
-  println(celsiusToFahr(0))
+  def multiply(a: Int, b: Int): Int = {
+    a * b
+  }
 
-  // 4. Define a function that solves the quadratic formula, given a, b, and c
+  def isPositive(x: Int) = {
+    if (x > 0) true else false
+  }
+
+  def isDivisibleBy4(x: Int): Boolean = {
+    x % 4 == 0
+  }
+
+  def mystery(x: Int, y: Int): Boolean = {
+    x % y == 0
+  }
+
+  def feetToInches(feet: Int): Int = {
+    feet * 12
+  }
+
+  def inchesToFeet(x: Int): (Int, Int) = {
+    val feet = x / 12
+    val inches = x % 12
+    (feet, inches)
+  }
+
+  def inchesToFeetDecimal(x: Int): Double = {
+    val feet = x / 12
+    val inches = x % 12
+    val fraction = inches.toDouble / 12.0
+    feet + fraction
+  }
+
+  def kilometersToMiles(kilos: Double): Double = {
+    kilos * 0.621371
+  }
+
+  def poundsToKilograms(lbs: Double): Double = {
+    lbs * 0.453592
+  }
+
+  def fahrenheitToCelsius(t: Double) = {
+    // T(°C) = (T(°F) - 32) × 5/9
+    (t - 32.0) * (5.0 / 9.0)
+  }
+
+  def numberToString(i: Int): String = {
+    i.toString
+  }
+
+  def stringToInt(text: String): Int = {
+    text.toInt
+  }
+  stringToInt("453")
+  // stringToInt("uh oh")
+
   def quadratic(a: Double, b: Double, c: Double): Seq[Double] = {
     // -b
     val negativeB = b * -1.0
@@ -37,14 +121,18 @@ object Unit1Exercises extends App {
     val discriminant = (b * b) - (4.0 * a * c)
     val discriminantSqrt = Math.sqrt(discriminant)
 
-    val numeratorPlus = Try { negativeB + discriminantSqrt }.toOption
-    val numeratorMinus = Try { negativeB - discriminantSqrt }.toOption
+    val numeratorPlus = Try {negativeB + discriminantSqrt}.toOption
+    val numeratorMinus = Try {negativeB - discriminantSqrt}.toOption
     val denominator = 2.0 * a
     val root1 = numeratorPlus.map(n => n / denominator)
     val root2 = numeratorMinus.map(n => n / denominator)
     Seq(root1, root2).flatten
   }
 
-  println("x^2 + x - 1: " + quadratic(1, 1, -1))
+  println(quadratic(2, -5, -3))
+  println(fahrenheitToCelsius(-50))
+  println(Util.round(fahrenheitToCelsius(-50)))
+  println(fahrenheitToCelsius(100))
+  println(fahrenheitToCelsius(10))
 
 }

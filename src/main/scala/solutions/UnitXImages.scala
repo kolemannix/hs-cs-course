@@ -1,6 +1,8 @@
-import UnitXImages.{ flower, gandalf }
-import com.sksamuel.scrimage.{ Color, Image, Pixel }
+package solutions
+
+import com.sksamuel.scrimage.{ Image, Pixel }
 import lib.Img._
+import solutions.UnitXImages.flower
 
 object UnitXImages extends App {
 

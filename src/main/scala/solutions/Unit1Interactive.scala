@@ -1,3 +1,5 @@
+package solutions
+
 import lib.Util
 
 object ChangeCountr extends App {

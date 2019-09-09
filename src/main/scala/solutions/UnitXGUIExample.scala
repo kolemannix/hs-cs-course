@@ -1,10 +1,11 @@
-import scala.swing._
-import scala.swing.BorderPanel.Position._
-import event._
+package solutions
+
 import java.awt.{ Color, Graphics2D }
+
+import scala.swing.BorderPanel.Position._
+import scala.swing.event._
+import scala.swing.{ Panel, _ }
 import scala.util.Random
-import scala.swing.Panel
-import java.awt.{ Graphics2D, Color }
 
 
 object SimpleGUI extends SimpleSwingApplication {

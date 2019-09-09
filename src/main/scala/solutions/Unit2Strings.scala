@@ -1,3 +1,5 @@
+package solutions
+
 object Unit2Strings {
 
   // Series of expressions intended to be run in the console

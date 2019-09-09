@@ -1,3 +1,5 @@
+package solutions
+
 object Unit3Algorithms extends App {
 
   def fibonacci(n: Int): Int = {

@@ -1,8 +1,10 @@
+package solutions
+
 import scala.util.Random
 
 import lib.Util._
 
-object CaeserCipher extends App {
+object CaesarCipher extends App {
 
   def alphabet = "abcdefghijklmnopqrstuvwxyz"
   lazy val scrambledAlphabet = alphabet.sortBy(_ => Random.nextBoolean())
