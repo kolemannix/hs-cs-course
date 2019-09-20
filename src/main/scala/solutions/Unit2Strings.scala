@@ -52,4 +52,6 @@ object Unit2Strings {
 
   '3'.isValidInt
 
+  'a'.toByte.toInt
+
 }
