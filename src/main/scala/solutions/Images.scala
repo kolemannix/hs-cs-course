@@ -16,7 +16,7 @@ object UnitXImages extends App {
   // draw(flower)
   // draw(yoda)
 
-  val red = buildImage(width = 40, height = 40, { (x, y) => Pixel(255, 0, 0, 255) })
+  val red = buildImage(width = 500, height = 300, { (x, y) => Pixel(255, 0, 0, 255) })
   // draw(red)
 
   def lightenSimple(pixel: Pixel): Pixel = {

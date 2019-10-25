@@ -14,12 +14,12 @@ object Img {
   }
 
   def loadImageUrl(url: String): Image = {
-    val inputStream = new URL("https://dl.dropboxusercontent.com/s/m5qqmupg0h6w97k/yoda.bmp?dl=0").openStream()
+    val inputStream = new URL(url).openStream()
     Image.fromStream(inputStream)
   }
 
   def buildImage(width: Int, height: Int, builder: (Int, Int) => Pixel): Image = {
-    Image.apply(width, height).map { case (x, y, _) =>
+    Image(width, height).map { case (x, y, _) =>
       builder(x, y)
     }
   }
