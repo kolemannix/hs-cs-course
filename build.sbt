@@ -38,7 +38,7 @@ lazy val lib = (project in file("lib"))
       scrimageExtra,
       scrimageFilters,
       betterFiles,
-      scalaSwing
+      scalaSwing,
     )
   )
 

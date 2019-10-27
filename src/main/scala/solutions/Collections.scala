@@ -19,8 +19,6 @@ object Collections extends App {
   // While head and last and indexing are useful, the most important thing we do with collections is go
   // through them one-by-one. This is called "iterating" over a collection.
   // We do this most often with "foreach" and "map"
-  println("s1 foreach")
-  s1.foreach(i => println("i is " + i))
   println("s1 map")
   s1.map(i => println("i is " + i))
 
@@ -28,6 +26,7 @@ object Collections extends App {
   val addOne: Int => Int = {
     x => x + 1
   }
+
   val s2 = s1.map(addOne)
   println("s2: " + s2)
   // We can also write the function "inline" - which means not defining it separately.

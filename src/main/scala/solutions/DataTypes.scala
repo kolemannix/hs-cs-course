@@ -12,6 +12,7 @@ object DataTypes extends App {
    */
 
   case class Point(x: Double, y: Double)
+  case class Student(name: String, age: Int, gpa: Double)
 
   val origin = Point(0, 0)
 
@@ -27,7 +28,7 @@ object DataTypes extends App {
     team2Score: Int,
     currentQuarter: Int,
     timeLeft: Double,
-    possessionArrow: Possession
+    possessionArrow: Possession,
   )
 
   trait Possession
