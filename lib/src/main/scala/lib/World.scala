@@ -1,10 +1,16 @@
 package lib
 
-import java.awt.Graphics
+import java.awt.event.{ MouseEvent, MouseListener }
 import java.awt.image.BufferedImage
+import java.awt.{ Graphics, Graphics2D }
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 
-import javax.swing.{ JPanel, WindowConstants }
-import lib.World.{ Button, Key, Scene }
+import scala.concurrent.duration.FiniteDuration
+
+import com.sksamuel.scrimage.Color
+import javax.swing.{ JFrame, JPanel, WindowConstants }
+import lib.World._
 
 object World {
 
@@ -63,56 +69,143 @@ object World {
   case object LeftButton extends Button
   case object RightButton extends Button
 
+  sealed trait Drawable
+
+  case class Point(x: Int, y: Int)
+  object Point {
+    def origin: Point = Point(0, 0)
+  }
+  case class Image(underlying: BufferedImage, start: Point) extends Drawable {
+    // TODO: Delegates to underlying w/h, make it scalable
+    def width: Int = underlying.getWidth
+    def height: Int = underlying.getHeight
+  }
+  object Image {
+    def fromResource(fileName: String): Image = {
+      val buf = com.sksamuel.scrimage.Image.fromResource(fileName).toNewBufferedImage()
+      Image(buf, Point.origin)
+    }
+  }
+
+  case class Rectangle(
+    x: Int, y: Int, width: Int, height: Int,
+    solid: Boolean = true, color: Color = Color.Black
+  ) extends Drawable
+
   case class Scene(
-    images: Seq[BufferedImage],
+    drawables: Seq[Drawable],
     texts: Seq[String]
   )
 
-  def apply[State](
-    initial: State,
-    onTick: (State => State),
-    onKey: (State, Key) => State,
-    onMouse: (State, Double, Double, Button) => State,
-    stopWhen: (State) => Boolean,
-    draw: (State => Scene)
-  ): World[State] = {
-    new World[State](initial, onTick, onKey, onMouse, stopWhen, draw)
+  def simple[S](
+    initial: S,
+    onTick: (S => S),
+    draw: Draw[S]
+  ): World[S] = {
+    new World[S](initial, defaultTickInterval, onTick, defaultOnKey, defaultOnMouse, defaultStopWhen, draw)
+  }
+
+  type OnKey[S] = (S, Key) => S
+  type OnMouse[S] = (S, Point, Button) => S
+  type OnTick[S] = (S) => S
+  type StopWhen[S] = (S) => Boolean
+  type Draw[S] = (S) => Scene
+
+  private def defaultOnKey[S]: OnKey[S] = { (s: S, _: Key) => s }
+  private def defaultOnMouse[S]: OnMouse[S] = { (s: S, _: Point, _: Button) => s }
+  private def defaultStopWhen[S]: StopWhen[S] = { (_: S) => false }
+  private val defaultTickInterval = FiniteDuration(25, TimeUnit.MILLISECONDS)
+
+  def apply[S](
+    initial: S,
+    tickInterval: FiniteDuration = defaultTickInterval,
+    onTick: OnTick[S],
+    onKey: OnKey[S] = defaultOnKey[S],
+    onMouse: OnMouse[S] = defaultOnMouse[S],
+    stopWhen: StopWhen[S] = defaultStopWhen[S],
+    draw: (S => Scene)
+  ): World[S] = {
+    new World[S](initial, tickInterval, onTick, onKey, onMouse, stopWhen, draw)
   }
 
 }
 
-class World[State](
-  initial: State,
-  val onTick: (State => State),
-  val onKey: (State, Key) => State,
-  val onMouse: (State, Double, Double, Button) => State,
-  val stopWhen: (State) => Boolean,
-  val draw: (State => Scene)
+class World[S](
+  initial: S,
+  tickInterval: FiniteDuration,
+  val onTick: OnTick[S],
+  val onKey: OnKey[S],
+  val onMouse: OnMouse[S],
+  val stopWhen: StopWhen[S],
+  val draw: (S => Scene)
 ) {
 
-  var state = initial
+  val state = new AtomicReference(initial)
 
-  def makePanel(render: (Graphics, State) => Unit) = {
+  var deadline = tickInterval.fromNow
+
+  var myFrame = init()
+
+  def stop(): Unit = {
+    myFrame.setVisible(false)
+  }
+
+  def makePanel(render: (Graphics2D, S) => Unit) = {
     val panel = new JPanel() {
       override def paintComponent(g: Graphics): Unit = {
         super.paintComponent(g)
-        render(g, state)
+        render(g.asInstanceOf[Graphics2D], state)
       }
     }
+    panel.addMouseListener(new MouseListener {
+      override def mouseClicked(e: MouseEvent): Unit = {
+        state.set(onMouse(state, Point(e.getX, e.getY), LeftButton))
+      }
+      override def mousePressed(e: MouseEvent): Unit = {
+
+      }
+      override def mouseReleased(e: MouseEvent): Unit = {
+
+      }
+      override def mouseEntered(e: MouseEvent): Unit = {
+
+      }
+      override def mouseExited(e: MouseEvent): Unit = {
+
+      }
+    })
     panel
   }
 
-  def init(title: String = "World"): Unit = {
+  def render: (Graphics2D, S) => Unit = {
+    case (g, st) =>
+      val scene = draw(state)
+      scene.drawables.map {
+        case Image(underlying, start) =>
+          g.drawImage(underlying, start.x, start.y, null)
+        case Rectangle(x, y, width, height, solid, color) =>
+          withColor(g, color.toAWT) {
+            if (solid) {
+              g.fillRect(x, y, width, height)
+            } else {
+              g.drawRect(x, y, width, height)
+            }
+          }
+
+      }
+      ()
+  }
+
+  def withColor(g2: Graphics2D, color: java.awt.Color)(value: => Unit): Unit = {
+    val oldColor = g2.getColor
+    g2.setColor(color)
+    value
+    g2.setColor(oldColor)
+  }
+
+  def init(title: String = "World"): JFrame = {
     val swingFrame = new javax.swing.JFrame(title)
 
-    val render: (Graphics, State) => Unit = {
-      case (g: Graphics, st: State) =>
-        println("Rendering")
-        val scene = draw(state)
-        scene.images.map { image =>
-          g.drawImage(image, 0, 0, null)
-        }
-    }
     val panel = makePanel(render)
 
     swingFrame.add(panel)
@@ -120,6 +213,18 @@ class World[State](
     swingFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
     swingFrame.setSize(400, 600)
     swingFrame.setVisible(true)
+    swingFrame
   }
   // New JFrame, render loop, calling tick and onKey and stuff
+
+  while (true) {
+    if (deadline.isOverdue()) {
+      if (stopWhen(state)) {
+        stop()
+      }
+      state.set(onTick(state))
+      deadline = tickInterval.fromNow
+      myFrame.repaint()
+    }
+  }
 }
