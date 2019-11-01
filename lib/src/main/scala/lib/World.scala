@@ -140,7 +140,8 @@ class World[S](
   val draw: (S => Scene)
 ) {
 
-  val state = new AtomicReference(initial)
+  // val state = new AtomicReference(initial)
+  var state = initial
 
   var deadline = tickInterval.fromNow
 
@@ -159,7 +160,7 @@ class World[S](
     }
     panel.addMouseListener(new MouseListener {
       override def mouseClicked(e: MouseEvent): Unit = {
-        state.set(onMouse(state, Point(e.getX, e.getY), LeftButton))
+        state = onMouse(state, Point(e.getX, e.getY), LeftButton)
       }
       override def mousePressed(e: MouseEvent): Unit = {
 
@@ -222,7 +223,7 @@ class World[S](
       if (stopWhen(state)) {
         stop()
       }
-      state.set(onTick(state))
+      state = onTick(state)
       deadline = tickInterval.fromNow
       myFrame.repaint()
     }
