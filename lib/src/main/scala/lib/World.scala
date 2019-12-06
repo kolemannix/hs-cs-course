@@ -2,7 +2,7 @@ package lib
 
 import java.awt.event.{ MouseEvent, MouseListener }
 import java.awt.image.BufferedImage
-import java.awt.{ Font, Graphics, Graphics2D }
+import java.awt.{ AlphaComposite, Font, Graphics, Graphics2D }
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
@@ -98,37 +98,37 @@ object World {
   object Point {
     def origin: Point = Point(0, 0)
   }
-  case class Image(
+  case class Sprite(
     underlying: Scrimage,
     start: Point,
   ) extends Drawable {
-    lazy val bufImg: BufferedImage = underlying.toNewBufferedImage()
+    lazy val bufImg: BufferedImage = underlying.toNewBufferedImage(BufferedImage.TYPE_INT_ARGB)
     def width: Int = underlying.width
     def height: Int = underlying.height
 
-    def map(fn: Pixel => Pixel): Image = {
-      new Image(lib.Img.transformImage(underlying, fn), start)
+    def map(fn: Pixel => Pixel): Sprite = {
+      new Sprite(lib.Img.transformImage(underlying, fn), start)
     }
 
     override def hitbox: BoundingBox = {
       BoundingBox.fromRect(start.x, start.y, width, height)
     }
   }
-  object Image {
-    def apply(image: Scrimage, start: Point = Point.origin, width: Int = -1, height: Int = -1): Image = {
-      val bufImg = if (width != -1 && height != -1) {
-        image.scaleTo(width, height).toNewBufferedImage()
+  object Sprite {
+    def apply(image: Scrimage, start: Point = Point.origin, width: Int = -1, height: Int = -1): Sprite = {
+      val img = if (width != -1 && height != -1) {
+        image.scaleTo(width, height)
       } else {
-        image.toNewBufferedImage()
+        image
       }
-      new Image(bufImg, start)
+      new Sprite(img, start)
     }
     def fromResource(
       fileName: String,
       start: Point = Point.origin,
       width: Int = -1,
       height: Int = -1
-    ): Image = {
+    ): Sprite = {
       val image = Scrimage.fromResource(fileName)
       apply(image, start, width, height)
     }
@@ -169,7 +169,7 @@ object World {
     onTick: (S => S),
     draw: Draw[S]
   ): World[S] = {
-    new World[S](initial, defaultTickInterval, 600, 400, onTick, defaultOnKey, defaultOnMouse, defaultStopWhen, draw)
+    new World[S]("World", initial, defaultTickInterval, 600, 400, onTick, defaultOnKey, defaultOnMouse, defaultStopWhen, draw)
   }
 
   type OnKey[S] = (S, Key) => S
@@ -184,6 +184,7 @@ object World {
   private val defaultTickInterval = FiniteDuration(25, TimeUnit.MILLISECONDS)
 
   def apply[S](
+    name: String,
     initial: S,
     tickInterval: FiniteDuration = defaultTickInterval,
     width: Int = 600,
@@ -194,12 +195,13 @@ object World {
     stopWhen: StopWhen[S] = defaultStopWhen[S],
     draw: (S => Scene)
   ): World[S] = {
-    new World[S](initial, tickInterval, width, height, onTick, onKey, onMouse, stopWhen, draw)
+    new World[S](name, initial, tickInterval, width, height, onTick, onKey, onMouse, stopWhen, draw)
   }
 
 }
 
 class World[S](
+  name: String,
   initial: S,
   tickInterval: FiniteDuration,
   width: Int,
@@ -217,7 +219,7 @@ class World[S](
 
   private var deadline = tickInterval.fromNow
 
-  private var myFrame = init()
+  private var myFrame = init(name)
 
   def stop(): Unit = {
     myFrame.setVisible(false)
@@ -254,8 +256,9 @@ class World[S](
     case (g, st) =>
       val scene = draw(state)
       scene.drawables.map {
-        case img: Image =>
-          g.drawImage(img.bufImg, img.start.x, img.start.y, null)
+        case img: Sprite =>
+          g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f))
+          g.drawImage(img.bufImg, img.start.x, img.start.y, null, null)
         case Ellipse(x, y, width, height, solid, color) =>
           withColor(g, color.toAWT) {
             if (solid) g.fillOval(x, y, width, height)

@@ -1,7 +1,7 @@
 package lib
 
 import com.sksamuel.scrimage.Color
-import lib.World.{ BoundingBox, Button, Image, Point, Rectangle, Scene }
+import lib.World.{ BoundingBox, Button, Sprite, Point, Rectangle, Scene }
 
 object TicTacToeWorld extends App {
 
@@ -29,7 +29,7 @@ object TicTacToeWorld extends App {
   val boardStartX = (totalWidth / 2) - (lineLength / 2)
   val boardStartY = (totalHeight / 2) - (lineLength / 2)
 
-  val flower = Image.fromResource("/image/flower.png", Point.origin, 600, 400)
+  val flower = Sprite.fromResource("/image/flower.png", Point.origin, 600, 400)
 
   def boundingBox(row: Int, col: Int): BoundingBox = {
     val scaleX = (row * space)
@@ -71,6 +71,7 @@ object TicTacToeWorld extends App {
   }
 
   val world = World[State](
+    "TicTacToe",
     initial = empty,
     onTick = onTick,
     onMouse = onMouse,

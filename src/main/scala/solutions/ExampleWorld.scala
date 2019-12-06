@@ -2,7 +2,7 @@ package solutions
 
 import com.sksamuel.scrimage.Pixel
 import lib.World
-import lib.World.{ Button, Ellipse, Image, Point, Rectangle, Scene, Text }
+import lib.World.{ Button, Ellipse, Sprite, Point, Rectangle, Scene, Text }
 
 object ExampleWorld extends App {
 
@@ -18,7 +18,7 @@ object ExampleWorld extends App {
     }
   }
 
-  val flower = Image.fromResource("/image/flower.png", Point.origin, 600, 400)
+  val flower = Sprite.fromResource("/image/flower.png", Point.origin, 600, 400)
   val grayFlower = flower.map({ p =>
     val avg = (p.red + p.green + p.blue) / 3
     Pixel(avg, avg, avg, p.alpha)
@@ -26,7 +26,7 @@ object ExampleWorld extends App {
 
   val cyanOval = Ellipse(100, 100, 100, 200, true, World.cyan)
 
-  def empty = State(false, true, 0)
+  def startState = State(false, true, 0)
 
   def draw(state: State): Scene = {
     val currentFlower = if (state.isGray) grayFlower else flower
@@ -59,7 +59,8 @@ object ExampleWorld extends App {
   }
 
   val world = World[State](
-    initial = empty,
+    name = "Example",
+    initial = startState,
     onTick = onTick,
     onMouse = onMouse,
     draw = draw
