@@ -22,10 +22,10 @@ object RockCatcher extends App {
   val background = Sprite(desert, Point.origin, 800, 600)
 
   def draw(state: GameState): Scene = {
-    val rocks = state.rocks.map(rock => Sprite(rockImage, rock))
+    val rockSprites = state.rocks.map(rock => Sprite(rockImage, rock))
     val statePrint = Text(50, 40, state.toString, 24)
     Scene(
-      Seq(background, statePrint) ++ rocks
+      Seq(background, statePrint) ++ rockSprites
     )
   }
 
