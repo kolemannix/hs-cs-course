@@ -2,17 +2,25 @@ package lib
 
 import java.awt.event.{ MouseEvent, MouseListener }
 import java.awt.image.BufferedImage
-import java.awt.{ Graphics, Graphics2D }
+import java.awt.{ Font, Graphics, Graphics2D }
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 import scala.concurrent.duration.FiniteDuration
 
-import com.sksamuel.scrimage.Color
+import com.sksamuel.scrimage.{ Color, Pixel, Image => Scrimage }
 import javax.swing.{ JFrame, JPanel, WindowConstants }
 import lib.World._
 
 object World {
+
+  final val black: Color = Color.Black
+  final val white: Color = Color.White
+  final val red: Color = Color.awt2color(java.awt.Color.red)
+  final val blue: Color = Color.awt2color(java.awt.Color.blue)
+  final val green: Color = Color.awt2color(java.awt.Color.green)
+  final val yellow: Color = Color.awt2color(java.awt.Color.yellow)
+  final val cyan: Color = Color.awt2color(java.awt.Color.cyan)
 
   sealed trait Key
 
@@ -65,36 +73,95 @@ object World {
     */
   }
 
+  case class BoundingBox(x1: Int, y1: Int, x2: Int, y2: Int) {
+    def contains(point: Point): Boolean = {
+      point.x >= x1 &&
+        point.y >= y1 &&
+        point.x <= x2 &&
+        point.y <= y2
+    }
+  }
+
+  object BoundingBox {
+    def fromRect(x: Int, y: Int, width: Int, height: Int) = BoundingBox(x, y, x + width, y + height)
+  }
+
   sealed trait Button
   case object LeftButton extends Button
   case object RightButton extends Button
 
-  sealed trait Drawable
+  sealed trait Drawable {
+    def hitbox: BoundingBox
+  }
 
   case class Point(x: Int, y: Int)
   object Point {
     def origin: Point = Point(0, 0)
   }
-  case class Image(underlying: BufferedImage, start: Point) extends Drawable {
-    // TODO: Delegates to underlying w/h, make it scalable
-    def width: Int = underlying.getWidth
-    def height: Int = underlying.getHeight
+  case class Image(
+    underlying: Scrimage,
+    start: Point,
+  ) extends Drawable {
+    lazy val bufImg: BufferedImage = underlying.toNewBufferedImage()
+    def width: Int = underlying.width
+    def height: Int = underlying.height
+
+    def map(fn: Pixel => Pixel): Image = {
+      new Image(lib.Img.transformImage(underlying, fn), start)
+    }
+
+    override def hitbox: BoundingBox = {
+      BoundingBox.fromRect(start.x, start.y, width, height)
+    }
   }
   object Image {
-    def fromResource(fileName: String): Image = {
-      val buf = com.sksamuel.scrimage.Image.fromResource(fileName).toNewBufferedImage()
-      Image(buf, Point.origin)
+    def apply(image: Scrimage, start: Point = Point.origin, width: Int = -1, height: Int = -1): Image = {
+      val bufImg = if (width != -1 && height != -1) {
+        image.scaleTo(width, height).toNewBufferedImage()
+      } else {
+        image.toNewBufferedImage()
+      }
+      new Image(bufImg, start)
+    }
+    def fromResource(
+      fileName: String,
+      start: Point = Point.origin,
+      width: Int = -1,
+      height: Int = -1
+    ): Image = {
+      val image = Scrimage.fromResource(fileName)
+      apply(image, start, width, height)
     }
   }
 
   case class Rectangle(
     x: Int, y: Int, width: Int, height: Int,
     solid: Boolean = true, color: Color = Color.Black
-  ) extends Drawable
+  ) extends Drawable {
+    override def hitbox: BoundingBox = BoundingBox.fromRect(x, y, width, height)
+  }
+
+  case class Ellipse(
+    x: Int, y: Int, width: Int, height: Int,
+    solid: Boolean = true, color: Color = Color.Black
+  ) extends Drawable {
+    override def hitbox: BoundingBox = BoundingBox.fromRect(x, y, width, height)
+  }
+
+  case class Text(
+    x: Int, y: Int,
+    text: String, size: Int, color: Color = Color.Black
+  ) extends Drawable {
+    lazy val font: Font = new Font("Arial", Font.BOLD, size)
+    override def hitbox: BoundingBox = BoundingBox.fromRect(x, y, 0, 0)
+  }
+
+  //  case class Line(
+  //    x: Int, y: Int, weight: Int, color: Color = Color.Black
+  //  ) extends Drawable
 
   case class Scene(
-    drawables: Seq[Drawable],
-    texts: Seq[String]
+    drawables: Seq[Drawable]
   )
 
   def simple[S](
@@ -102,7 +169,7 @@ object World {
     onTick: (S => S),
     draw: Draw[S]
   ): World[S] = {
-    new World[S](initial, defaultTickInterval, onTick, defaultOnKey, defaultOnMouse, defaultStopWhen, draw)
+    new World[S](initial, defaultTickInterval, 600, 400, onTick, defaultOnKey, defaultOnMouse, defaultStopWhen, draw)
   }
 
   type OnKey[S] = (S, Key) => S
@@ -119,13 +186,15 @@ object World {
   def apply[S](
     initial: S,
     tickInterval: FiniteDuration = defaultTickInterval,
+    width: Int = 600,
+    height: Int = 400,
     onTick: OnTick[S],
     onKey: OnKey[S] = defaultOnKey[S],
     onMouse: OnMouse[S] = defaultOnMouse[S],
     stopWhen: StopWhen[S] = defaultStopWhen[S],
     draw: (S => Scene)
   ): World[S] = {
-    new World[S](initial, tickInterval, onTick, onKey, onMouse, stopWhen, draw)
+    new World[S](initial, tickInterval, width, height, onTick, onKey, onMouse, stopWhen, draw)
   }
 
 }
@@ -133,6 +202,8 @@ object World {
 class World[S](
   initial: S,
   tickInterval: FiniteDuration,
+  width: Int,
+  height: Int,
   val onTick: OnTick[S],
   val onKey: OnKey[S],
   val onMouse: OnMouse[S],
@@ -140,18 +211,19 @@ class World[S](
   val draw: (S => Scene)
 ) {
 
+  // TODO: Atomicity
   // val state = new AtomicReference(initial)
-  var state = initial
+  private var state = initial
 
-  var deadline = tickInterval.fromNow
+  private var deadline = tickInterval.fromNow
 
-  var myFrame = init()
+  private var myFrame = init()
 
   def stop(): Unit = {
     myFrame.setVisible(false)
   }
 
-  def makePanel(render: (Graphics2D, S) => Unit) = {
+  private def makePanel(render: (Graphics2D, S) => Unit) = {
     val panel = new JPanel() {
       override def paintComponent(g: Graphics): Unit = {
         super.paintComponent(g)
@@ -182,8 +254,17 @@ class World[S](
     case (g, st) =>
       val scene = draw(state)
       scene.drawables.map {
-        case Image(underlying, start) =>
-          g.drawImage(underlying, start.x, start.y, null)
+        case img: Image =>
+          g.drawImage(img.bufImg, img.start.x, img.start.y, null)
+        case Ellipse(x, y, width, height, solid, color) =>
+          withColor(g, color.toAWT) {
+            if (solid) g.fillOval(x, y, width, height)
+            else g.drawOval(x, y, width, height)
+          }
+        //        case Line(x, y, weight, color) =>
+        //          withColor(g, color.toAWT) {
+        //            g.drawLine(x1, y1, x2, y2)
+        //          }
         case Rectangle(x, y, width, height, solid, color) =>
           withColor(g, color.toAWT) {
             if (solid) {
@@ -192,7 +273,11 @@ class World[S](
               g.drawRect(x, y, width, height)
             }
           }
-
+        case t @ Text(x, y, text, size, color) =>
+          withColor(g, color.toAWT) {
+            g.setFont(t.font)
+            g.drawString(text, x, y)
+          }
       }
       ()
   }
@@ -212,7 +297,7 @@ class World[S](
     swingFrame.add(panel)
 
     swingFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-    swingFrame.setSize(400, 600)
+    swingFrame.setSize(width, height)
     swingFrame.setVisible(true)
     swingFrame
   }

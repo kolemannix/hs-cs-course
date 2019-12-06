@@ -1,6 +1,7 @@
-import lib.Markov.{ buildDatabase, generate }
-import lib.Util.example
+package lib
+
 import better.files.Resource
+import lib.Markov.{ buildDatabase, generate }
 
 object MarkovTest extends App {
   val dickensCorpus = Resource.getAsString("dickens.txt")

@@ -1,7 +1,9 @@
 package solutions
 
+import com.sksamuel.scrimage.filter.{ ChromeFilter, GaussianBlurFilter, GlowFilter, TwirlFilter }
 import lib.Img._
 import com.sksamuel.scrimage.{ Image, Pixel }
+import thirdparty.jhlabs.image.WaterFilter
 
 object UnitXImages extends App {
 
@@ -10,6 +12,7 @@ object UnitXImages extends App {
   val flower = Image.fromResource("/image/flower.png")
   val gandalf = Image.fromResource("/image/gandalf.png")
   val ramp = Image.fromResource("/image/ramp.png")
+  val tucker = Image.fromResource("/image/tucker2.jpg")
 
   // draw(ramp)
   // draw(gandalf)
@@ -40,22 +43,22 @@ object UnitXImages extends App {
 
   // Exercise 2 - Convert an image to grayscale using the Average method
   // Name your resulting image exercise2
-  val exercise2 = transformImage(gandalf, { p =>
+  val exercise2 = transformImage(tucker, { p =>
     val avg = (p.red + p.green + p.blue) / 3
     Pixel(avg, avg, avg, p.alpha)
   })
-  // draw(exercise2)
+//  draw(exercise2)
 
   // Exercise 3 - Convert an image to grayscale using the Luminance method
   // Name your resulting image exercise3
   val lumRed = 0.30
   val lumGreen = 0.59
   val lumBlue = 0.11
-  val exercise3 = transformImage(flower, { p =>
+  val exercise3 = transformImage(tucker, { p =>
     val avgLum = (lumRed * p.red) + (lumGreen * p.green) + (lumBlue * p.blue)
     Pixel(avgLum.toInt, avgLum.toInt, avgLum.toInt, p.alpha)
   })
-  // draw(exercise3)
+//  draw(exercise3)
 
   // Think about the similarities between exercise 2 and exercise 3.
   // - Are they really the same algorithm?
@@ -107,4 +110,11 @@ object UnitXImages extends App {
   //  draw(blues)
   //  draw(puzzleThree)
   //  draw(exercise6)
+
+  // Some fun with filters
+  val chromedalf = gandalf.filter(ChromeFilter())
+  val twirldalf = gandalf.filter(TwirlFilter(gandalf.width / 2))
+  val blurdalf = gandalf.filter(GaussianBlurFilter(10))
+  val glowdalf = gandalf.filter(GlowFilter())
+  draw(glowdalf)
 }

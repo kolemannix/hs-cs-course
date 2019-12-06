@@ -24,6 +24,10 @@ object Img {
     }
   }
 
+  def buildImageSimple(builder: () => Pixel): Image = {
+    buildImage(500, 500, { (_, _) => builder() })
+  }
+
   def clamp255(value: Int): Int = {
     if (value < 0) 0
     else if (value > 255) 255
