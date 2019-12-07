@@ -1,6 +1,6 @@
 package lib
 
-import java.awt.event.{ MouseEvent, MouseListener }
+import java.awt.event.{ KeyEvent, KeyListener, MouseEvent, MouseListener }
 import java.awt.image.BufferedImage
 import java.awt.{ AlphaComposite, Font, Graphics, Graphics2D }
 import java.util.concurrent.TimeUnit
@@ -24,54 +24,13 @@ object World {
 
   sealed trait Key
 
-  case class Letter(l: String) extends Key {
-    require(l.size == 1 && l.head.isLetterOrDigit)
-  }
-  case class Special(code: String) extends Key {
-    /*
-   Backspace key: "backspace"
-
- Tab key: "tab"
-
- Enter key: "enter"
-
- Shift key: "shift"
-
- Control key: "control"
-
- Pause key: "pause"
-
- Escape key: "escape"
-
- Prior key: "prior"
-
- Next key: "next"
-
- End key: "end"
-
- Home key: "home"
-
- Left arrow: "left"
-
- Up arrow: "up"
-
- Right arrow: "right"
-
- Down arrow: "down"
-
- Print key: "print"
-
- Insert key: "insert"
-
- Delete key: "delete"
-
- Backspace key: "backspace"
-
- Num lock key: "numlock"
-
- Scroll key: "scroll"
-    */
-  }
+  case class Letter(l: Char) extends Key
+  case object LeftArrow extends Key
+  case object RightArrow extends Key
+  case object UpArrow extends Key
+  case object DownArrow extends Key
+  case object Space extends Key
+  case object Backspace extends Key
 
   case class BoundingBox(x1: Int, y1: Int, x2: Int, y2: Int) {
     def contains(point: Point): Boolean = {
@@ -231,10 +190,33 @@ class World[S](
         super.paintComponent(g)
         render(g.asInstanceOf[Graphics2D], state)
       }
+      addKeyListener(new KeyListener {
+        override def keyTyped(e: KeyEvent): Unit = { }
+        override def keyReleased(e: KeyEvent): Unit = { }
+        override def keyPressed(e: KeyEvent): Unit = {
+          val key = e.getKeyCode match {
+            case KeyEvent.VK_LEFT => LeftArrow
+            case KeyEvent.VK_RIGHT => RightArrow
+            case KeyEvent.VK_UP => UpArrow
+            case KeyEvent.VK_DOWN => DownArrow
+            case KeyEvent.VK_SPACE => Space
+            case KeyEvent.VK_BACK_SPACE => Backspace
+            case _ if e.getKeyChar.isValidChar => Letter(e.getKeyChar)
+          }
+          state = onKey(state, key)
+        }
+      }
+      )
     }
+
     panel.addMouseListener(new MouseListener {
       override def mouseClicked(e: MouseEvent): Unit = {
-        state = onMouse(state, Point(e.getX, e.getY), LeftButton)
+        val button = e.getButton match {
+          case MouseEvent.BUTTON1 => LeftButton
+          case MouseEvent.BUTTON2 => RightButton
+          case _ => LeftButton
+        }
+        state = onMouse(state, Point(e.getX, e.getY), button)
       }
       override def mousePressed(e: MouseEvent): Unit = {
 
@@ -249,6 +231,7 @@ class World[S](
 
       }
     })
+    panel.setFocusable(true)
     panel
   }
 
@@ -276,7 +259,7 @@ class World[S](
               g.drawRect(x, y, width, height)
             }
           }
-        case t @ Text(x, y, text, size, color) =>
+        case t@Text(x, y, text, size, color) =>
           withColor(g, color.toAWT) {
             g.setFont(t.font)
             g.drawString(text, x, y)
