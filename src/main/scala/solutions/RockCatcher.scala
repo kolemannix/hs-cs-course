@@ -3,7 +3,7 @@ package solutions
 import scala.concurrent.duration.FiniteDuration
 
 import com.sksamuel.scrimage.Image
-import lib.World
+import lib.{ Img, World }
 import lib.World._
 
 object RockCatcher extends App {
@@ -17,7 +17,10 @@ object RockCatcher extends App {
     state.copy(rocks = newRocks)
   }
 
-  val rockImage = Image.fromResource("/image/rock.png").scaleTo(100, 100)
+  // val rockImage = Image.fromResource("/image/rock.png").scaleTo(100, 100)
+  val rockImage = Img.loadImageUrl(
+    "https://akm-img-a-in.tosshub.com/indiatoday/images/story/201705/dwayne-johnson-us-president---story_647_051217113745.jpg"
+  ).scaleTo(100, 100)
   val desert = Image.fromResource("/image/desert.jpg")
   val background = Sprite(desert, Point.origin, 800, 600)
 
