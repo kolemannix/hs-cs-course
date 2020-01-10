@@ -6,7 +6,9 @@ import java.awt.{ AlphaComposite, Font, Graphics, Graphics2D }
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
+import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration
+import scala.util.Try
 
 import com.sksamuel.scrimage.{ Color, Pixel, Image => Scrimage }
 import javax.swing.{ JFrame, JPanel, WindowConstants }
@@ -22,7 +24,7 @@ object World {
   final val yellow: Color = Color.awt2color(java.awt.Color.yellow)
   final val cyan: Color = Color.awt2color(java.awt.Color.cyan)
 
-  sealed trait Key
+  sealed trait Key extends Product with Serializable
 
   case class Letter(l: Char) extends Key
   case object LeftArrow extends Key
@@ -42,7 +44,22 @@ object World {
   }
 
   object BoundingBox {
-    def fromRect(x: Int, y: Int, width: Int, height: Int) = BoundingBox(x, y, x + width, y + height)
+    def fromRect(x: Int, y: Int, width: Int, height: Int): BoundingBox = BoundingBox(x, y, x + width, y + height)
+  }
+
+  def circlesIntersect(topLeft1: Point, radius1: Int, topLeft2: Point, radius2: Int): Boolean = {
+    val center1 = Point(topLeft1.x + radius1, topLeft1.y + radius1)
+    val center2 = Point(topLeft2.x + radius2, topLeft2.y + radius2)
+    val distSq = (center1.x - center2.x) * (center1.x - center2.x) +
+      (center1.y - center2.y) * (center1.y - center2.y)
+    val radSumSq = (radius1 + radius2) * (radius1 + radius2)
+    return (distSq <= radSumSq)
+  }
+
+  def pointInsideCircle(circlePoint: Point, radius: Int, point: Point): Boolean = {
+    val centerX = circlePoint.x + radius
+    val centerY = circlePoint.y + radius
+    Math.pow(point.x - centerX, 2) + Math.pow(point.y - centerY, 2) < (radius * radius)
   }
 
   sealed trait Button
@@ -184,6 +201,22 @@ class World[S](
     myFrame.setVisible(false)
   }
 
+  private val keys = mutable.HashSet.empty[Key]
+
+  private def getEventKey(event: KeyEvent): Option[Key] = {
+    Try {
+      event.getKeyCode match {
+        case KeyEvent.VK_LEFT => LeftArrow
+        case KeyEvent.VK_RIGHT => RightArrow
+        case KeyEvent.VK_UP => UpArrow
+        case KeyEvent.VK_DOWN => DownArrow
+        case KeyEvent.VK_SPACE => Space
+        case KeyEvent.VK_BACK_SPACE => Backspace
+        case _ if event.getKeyChar.isValidChar => Letter(event.getKeyChar)
+      }
+    }.toOption
+  }
+
   private def makePanel(render: (Graphics2D, S) => Unit) = {
     val panel = new JPanel() {
       override def paintComponent(g: Graphics): Unit = {
@@ -192,18 +225,11 @@ class World[S](
       }
       addKeyListener(new KeyListener {
         override def keyTyped(e: KeyEvent): Unit = { }
-        override def keyReleased(e: KeyEvent): Unit = { }
+        override def keyReleased(e: KeyEvent): Unit = {
+          getEventKey(e).map { key => keys.remove(key) }
+        }
         override def keyPressed(e: KeyEvent): Unit = {
-          val key = e.getKeyCode match {
-            case KeyEvent.VK_LEFT => LeftArrow
-            case KeyEvent.VK_RIGHT => RightArrow
-            case KeyEvent.VK_UP => UpArrow
-            case KeyEvent.VK_DOWN => DownArrow
-            case KeyEvent.VK_SPACE => Space
-            case KeyEvent.VK_BACK_SPACE => Backspace
-            case _ if e.getKeyChar.isValidChar => Letter(e.getKeyChar)
-          }
-          state = onKey(state, key)
+          getEventKey(e).map { key => keys.add(key) }
         }
       }
       )
@@ -294,7 +320,7 @@ class World[S](
       if (stopWhen(state)) {
         stop()
       }
-      state = onTick(state)
+      state = keys.foldLeft(onTick(state))({ case (state, key) => onKey(state, key)})
       deadline = tickInterval.fromNow
       myFrame.repaint()
     }
