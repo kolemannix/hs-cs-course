@@ -13,7 +13,7 @@ object RockCatcher extends App {
   val initialState = GameState(Seq(Point(20, 0)))
 
   def onTick(state: GameState): GameState = {
-    val newRocks = state.rocks.map(rock => Point(rock.x, (rock.y + 1) % 600))
+    val newRocks = state.rocks.map(rock => Point(rock.x, (rock.y + 1) % (600 - 100)))
     state.copy(rocks = newRocks)
   }
 
@@ -21,7 +21,7 @@ object RockCatcher extends App {
   val rockImage = Img.loadImageUrl(
     "https://akm-img-a-in.tosshub.com/indiatoday/images/story/201705/dwayne-johnson-us-president---story_647_051217113745.jpg"
   ).scaleTo(100, 100)
-  val desert = Image.fromResource("/image/desert.jpg")
+  val desert = Image.fromResource("/image/desert.jpg").scaleTo(800, 600)
   val background = Sprite(desert, Point.origin, 800, 600)
 
   def draw(state: GameState): Scene = {
@@ -36,7 +36,7 @@ object RockCatcher extends App {
     name = "RockCatcher",
     width = 800,
     height = 600,
-    tickInterval = FiniteDuration(10, "ms"),
+    tickInterval = FiniteDuration(25, "ms"),
     initial = initialState,
     onTick = onTick,
     draw = draw

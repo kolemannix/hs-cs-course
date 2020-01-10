@@ -283,7 +283,7 @@ class World[S](
     swingFrame.add(panel)
 
     swingFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-    swingFrame.setSize(width, height)
+    swingFrame.setSize(width, height + 20)
     swingFrame.setVisible(true)
     swingFrame
   }
