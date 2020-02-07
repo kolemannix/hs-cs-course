@@ -1,0 +1,140 @@
+// Minesweeper
+case class GameState(
+  board: Seq[Seq[Tile]],
+  timer: Int,
+) {
+
+  // The game is done when
+  // all tiles that are not bombs
+  // are discovered
+  def isDone: Boolean = ???
+
+}
+
+
+case class Tile(
+  isBomb: Boolean,
+  position: (X, Y),
+  isHidden: Boolean, OR isDiscovered
+  isMarked: Boolean
+)
+
+
+
+// Checkers
+
+tiles: Seq[Seq[Tile]]
+
+sealed trait Piece
+case object Empty extends Piece
+case object Red extends Piece
+case object KingRed extends Piece
+case object Blue extends Piece
+case object KingBlue extends Piece
+
+sealed trait MyBoolean
+case object Yes extends MyBoolean
+case object No extends MyBoolean
+
+sealed trait Drawable
+case class Rectangle() extends Drawable
+case class Ellipse() ...
+case class Sprite() ...
+case class Text() ...
+
+// Enumeration, or enumerated type, or enum
+case class Tile(
+  piece: Piece,
+  // isEmpty: Boolean,
+  // isBluePiece: Boolean,
+  // isRedPiece: Boolean
+)
+
+1     2     3
+false false false
+false false true
+false true  false
+false true  true
+true  false false
+true  false true
+true  true  false
+true  true  true
+
+Option[Boolean]:
+
+- None
+- Some(true)
+- Some(false)
+
+
+// Unknown Game
+
+case class GameState(
+  board: Seq[Seq[Tile]]
+)
+
+case class Tile(
+  isBomb: Boolean
+  isMarked: Boolean
+)
+
+3 2 1 1 1
+-----------
+x x x x x | 5
+x x / / / | 2
+x / / / / | 1
+/ / / / / | 0
+/ / / / / | 0
+
+// Will's game
+
+// sealed trait Enemy
+case class Enemy(position: Point, strategy: )
+
+case class GameState(
+  playerPosition: Point,
+  playerVelocityX: Int,
+  playerVelocityY: Int,
+  enemies: Seq[Enemy]
+)
+
+
+
+// The horror text-based RPG
+
+sealed trait Stuff
+case object Rock extends Stuff
+
+case class GameState(
+  inventory: Seq[Stuff]
+)
+
+object Game extends App {
+
+  var game = initialState
+  while (true) {
+    prompt(game)
+    val decision = readLine(...)
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
