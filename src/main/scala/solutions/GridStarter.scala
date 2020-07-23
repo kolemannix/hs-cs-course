@@ -26,7 +26,13 @@ object GridStarter extends App {
 
   def draw(state: GameState): Scene = {
     val rectangles = state.tiles.flatten.map({ tile =>
-      Rectangle(tile.point.x * TILE_SIZE, tile.point.y * TILE_SIZE, TILE_SIZE, TILE_SIZE, color = tile.color)
+      Rectangle(
+        x = tile.point.x * TILE_SIZE,
+        y = tile.point.y * TILE_SIZE,
+        width = TILE_SIZE,
+        height = TILE_SIZE,
+        color = tile.color
+      )
     })
     Scene(rectangles)
   }
@@ -46,6 +52,7 @@ object GridStarter extends App {
     })
   }
 
+  // Minesweeper
   val initialState = {
     val tiles =
       (0 to TILE_COUNT - 1).map { y =>
@@ -60,6 +67,8 @@ object GridStarter extends App {
       }
     GameState(tiles)
   }
+
+
 
   World(
     name = "GridStarter",

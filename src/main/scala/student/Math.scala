@@ -1,0 +1,5 @@
+package student
+
+object Math {
+
+}

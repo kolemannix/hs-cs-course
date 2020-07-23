@@ -120,6 +120,15 @@ object Game extends App {
 }
 
 
+Example project plan for Minesweeper, a list of features needed
+
+- Generate the board with some bombs, some not bombs
+- Introduce 'hidden' and 'revealed' tiles
+- Write a function to count adjacent bombs for a given tile
+- Clicking reveals a tile, game ends if it is a bomb
+- Draw revealed tiles
+- Add the timer
+- Add a score (number of revealed tiles)
 
 
 
@@ -130,11 +139,12 @@ object Game extends App {
 
 
 
-
-
-
-
-
-
+How a computer plays tic tac toe -> chess
+- Game States 3^9 = 19,683
+- 7.7∗ 10^45
+- Claude Shannon lower bound 10^120
+- 2Ghz = 2 * 10^9 = 2, 000 000 000
+- Guess, Check, and Adjust ("Machine Learning", "Supervised Learning")
+-
 
 
