@@ -2,8 +2,7 @@ image:
   file: .gitpod.Dockerfile
 
 tasks:
-  - init: 'echo "TODO: Replace with init/build command"'
-    command: sbt compile
+  - init: 'echo ready to roll'
 
 vscode:
   extensions:
