@@ -3,4 +3,9 @@ image:
 
 tasks:
   - init: 'echo "TODO: Replace with init/build command"'
-    command: sbt run
+    command: sbt compile
+
+vscode:
+  extensions:
+    - scalameta.metals@1.9.2:A7WIUV8jLUKzBJZUjM7zIg==
+    - scala-lang.scala@0.4.2:HkCdqnx7jBQQ2Oj2HZ90+w==

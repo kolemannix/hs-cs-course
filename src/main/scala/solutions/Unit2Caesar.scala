@@ -52,7 +52,7 @@ object CaesarCipher extends App {
     decryptedMessage
   }
 
-  example {
+  {
     val sample = "enemy has 5 howitzers"
     println("Sample: " + sample)
     val encrypted = caesarEncrypt(sample, 3)
@@ -61,7 +61,7 @@ object CaesarCipher extends App {
     println("\tDecrypted: " + decrypted)
   }
 
-  example {
+  {
     // Does it work with a scrambled alphabet?
     val sample = "i am 9 years old"
     println("Sample: " + sample)
