@@ -1,15 +1,8 @@
 ThisBuild / scalaVersion := "2.12.12"
 
-/* Macro settings */
-// addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M11" cross CrossVersion.full)
-// scalacOptions += "-Xplugin-require:macroparadise"
-// scalacOptions in(Compile, console) ~= (_ filterNot (_ contains "paradise"))
-/* Macro settings */
-
 resolvers += Resolver.bintrayRepo("underscoreio", "training")
 
 lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.0.8"
-// lazy val doodle = "underscoreio" %% "doodle" % "0.8.3"
 lazy val scrimageCore = "com.sksamuel.scrimage" %% "scrimage-core" % "2.1.8"
 lazy val scrimageExtra =
   "com.sksamuel.scrimage" %% "scrimage-io-extra" % "2.1.8"
@@ -32,7 +25,6 @@ lazy val root = (project in file("."))
       scalaSwing
     )
   )
-  .dependsOn(lib)
 
 //initialCommands in console :=
 //  """
