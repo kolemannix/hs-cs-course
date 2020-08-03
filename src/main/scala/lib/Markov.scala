@@ -3,7 +3,7 @@ package lib
 import java.time.Instant
 import lib.Util._
 
-object Markov extends App {
+object Markov {
 
   val sampleCorpus: String =
     """
@@ -131,5 +131,18 @@ object Markov extends App {
   ;;         db-b (build-database corpus-b n)]
   ;;     ))
      */
+
+}
+
+object MarkovTest extends App {
+    
+  import better.files.Resource
+
+  val dickensCorpus = Resource.getAsString("dickens.txt")
+  val dickensDb = Markov.buildDatabase(2, dickensCorpus)
+  (1 to 5) foreach { _ =>
+    val sentence = Markov.generate(dickensDb, 30)
+    println(sentence)
+  }
 
 }

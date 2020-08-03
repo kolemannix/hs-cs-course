@@ -26,9 +26,4 @@ object Util {
     def randomElement(): A = getRandomElement(s)
   }
 
-  private lazy val reader = new BufferedReader(new InputStreamReader(System.in))
-  def readLine(): String = {
-    reader.readLine()
-  }
-
 }

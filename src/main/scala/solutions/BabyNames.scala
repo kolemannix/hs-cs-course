@@ -4,6 +4,7 @@ import scala.util.Random
 
 import better.files.Resource
 import lib.Util
+import scala.io.StdIn
 
 case class BabyName(year: Int, name: String, percent: Double, gender: String)
 
@@ -31,7 +32,7 @@ object BabyNames extends App {
   val boyNames = babyNames.filter(isBoy)
 
   print("Boy or Girl name [b/g]: ")
-  val genderInput = Util.readLine()
+  val genderInput = StdIn.readLine()
   val pickGirl = genderInput.trim.toLowerCase() == "g"
 
   if (pickGirl) {

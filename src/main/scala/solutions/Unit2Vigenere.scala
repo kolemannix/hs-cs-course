@@ -50,11 +50,9 @@ object VigenereCipher extends App {
 
 object VigenereApp extends App {
 
-  import lib.Util.readLine
-
   while (true) {
     print("Message: ")
-    val input = readLine()
+    val input = scala.io.StdIn.readLine()
     print("Secret Key: ")
     val key = readLine()
 

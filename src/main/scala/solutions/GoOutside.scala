@@ -1,6 +1,7 @@
 package solutions
 
-import lib.Util
+import scala.io.StdIn
+
 
 object GoOutside extends App {
 
@@ -15,14 +16,14 @@ object GoOutside extends App {
   }
 
   print("Is it raining? ")
-  val rainingInput: String = Util.readLine()
+  val rainingInput: String = StdIn.readLine()
   val isRaining: Boolean = responseToBoolean(rainingInput)
 
   if (isRaining) {
     println("Stay inside")
   } else {
     print("Is it Saturday? ")
-    val isSaturday = responseToBoolean(Util.readLine())
+    val isSaturday = responseToBoolean(StdIn.readLine())
     if (isSaturday) {
       println("Go outside")
     } else {

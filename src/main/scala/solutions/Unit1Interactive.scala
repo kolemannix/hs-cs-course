@@ -1,25 +1,25 @@
 package solutions
 
-import lib.Util
+import scala.io.StdIn
 
 object ChangeCountr extends App {
 
   println("Welcome to ChangeCountr, the next Killer App.")
 
   print("Number of quarters: ")
-  val quartersInput = Util.readLine()
+  val quartersInput = StdIn.readLine()
   val quarters = quartersInput.toInt
 
   print("Number of dimes: ")
-  val dimesInput = Util.readLine()
+  val dimesInput = StdIn.readLine()
   val dimes = dimesInput.toInt
 
   print("Number of nickels: ")
-  val nickelsInput = Util.readLine()
+  val nickelsInput = StdIn.readLine()
   val nickels = nickelsInput.toInt
 
   print("Number of pennies: ")
-  val penniesInput = Util.readLine()
+  val penniesInput = StdIn.readLine()
   val pennies = penniesInput.toInt
 
   val cents = (quarters * 25) + (dimes * 10) + (nickels * 5) + pennies
@@ -43,7 +43,7 @@ object ChangeCountr2 extends App {
 
   def collect(prompt: String): Int = {
     print(prompt + ": ")
-    val input = Util.readLine()
+    val input = StdIn.readLine()
     input.toInt
   }
 

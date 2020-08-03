@@ -1,20 +1,18 @@
 package solutions
 
 import scala.util.Try
-
-import lib.Util
+import scala.io.StdIn
 
 object Quadratic extends App {
 
-
   print("A: ")
-  val a = Util.readLine().toDouble
+  val a = StdIn.readLine().toDouble
 
   print("B: ")
-  val b = Util.readLine().toDouble
+  val b = StdIn.readLine().toDouble
 
   print("C: ")
-  val c = Util.readLine().toDouble
+  val c = StdIn.readLine().toDouble
 
   val negativeB = (b * -1)
 

@@ -30,8 +30,6 @@ object CaesarInClass extends App {
     input.map(encode)
   }
 
-
-
   def vigenereEncode2(input: String, key: String): String = {
     def getTheOffset(i: Int): Int = {
       val char = key.charAt(i % key.length)

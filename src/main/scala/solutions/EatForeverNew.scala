@@ -2,6 +2,7 @@ package solutions
 
 import scala.concurrent.duration.FiniteDuration
 import scala.util.Random
+import scala.io.StdIn
 
 import com.sksamuel.scrimage.Color
 import lib.World
@@ -104,7 +105,7 @@ object EatForeverNew extends App {
   }
 
   print("Player 1 color: ")
-  val color = lib.Util.readLine() match {
+  val color = StdIn.readLine() match {
     case "red" => World.red
     case "blue" => World.blue
     case "yellow" | "y" => World.yellow
